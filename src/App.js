@@ -1,10 +1,10 @@
 import React from 'react';
-
+import Atlas from "./Components/Atlas";
 
 function App() {
   return (
     <div className="App">
-      <h1>Hello Wolrd</h1>
+      <Atlas></Atlas>
     </div>
   );
 }
