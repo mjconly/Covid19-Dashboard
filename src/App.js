@@ -4,8 +4,10 @@ import "./App.css"
 
 function App() {
   return (
-    <div id="mapid" className="App">
-      <Atlas></Atlas>
+    <div className="map-container">
+      <div id="mapid">
+          <Atlas></Atlas>
+      </div>
     </div>
   );
 }
