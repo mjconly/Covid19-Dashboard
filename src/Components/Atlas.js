@@ -10,113 +10,15 @@ class Atlas extends Component{
             lat: 30,
             lng: 0,
             zoom: 2,
-            height: 0,
-            width: 0,
-            mouseX: 0,
-            mouseY: 0,
-            transX: 0,
-            transY: 0,
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            draggable: false
         }
-
-        this.lens = createRef();
-
-        this.mouseMove = this.mouseMove.bind(this);
-        this.mouseUp = this.mouseUp.bind(this);
-        this.mouseDown = this.mouseDown.bind(this);
-        this.windowSize = this.windowSize.bind(this);
     }
 
     componentDidMount(){
-        window.addEventListener("resize", this.windowSize);
-        this.refs.map.leafletElement._layersMinZoom = 2;
-        console.log(this.refs.map.leafletElement.options);
-        this.windowSize();
+
     }
 
     componentWillUnmount(){
-        window.removeEventListener("resize", this.windowSize);
-    }
-
-    windowSize(){
-        const {left, top, right, height} = this.lens.current.parentElement.getBoundingClientRect();
-
-        const zoomControl = document.getElementsByClassName("leaflet-control-zoom");
-        zoomControl[0].style.opacity = "0.5";
-        console.log(zoomControl)
-
-        this.setState({
-            top: top + 1,
-            left: left + 1,
-            right: right,
-            bottom: height,
-            height: window.innerHeight,
-            width: window.innerWidth,
-            transX: 0,
-            transY: 0
-        })
-    }
-
-    mouseDown(e){
-        e.target.style.cursor = "grabbing";
-
-        console.log(this.lens);
-
-        const {clientX, clientY} = e.nativeEvent;
-
-        this.setState({
-            draggable: true,
-            mouseX: clientX,
-            mouseY: clientY
-        })
-    }
-
-    mouseUp(e){
-        e.target.style.cursor = "grab";
-        this.setState({
-            draggable: false,
-        })
-    }
-
-    mouseMove(e){
-        if (this.state.draggable){
-            let x = e.nativeEvent.clientX;
-            let y = e.nativeEvent.clientY;
-
-            let currX = this.state.transX;
-            let currY = this.state.transY;
-
-            let dx = x - this.state.mouseX;
-            let dy = y - this.state.mouseY;
-
-            dx += currX;
-            dy += currY; 
-
-            const {left, right, top, height} = this.lens.current.getBoundingClientRect();
-
-            
-            let toLeft = left + dx;
-            let toRight = right + dx;
-            let toTop = top + dy;
-            let toBot = height + dy;
-
-            let leftB = this.state.left + 10;
-            let rightB = this.state.right - 10;
-            let topB = this.state.top + 10;
-            let botB = this.state.bottom - 10;
-            
-
-            if (toLeft <= leftB && toRight >= rightB && toTop <= topB && toBot >= botB){
-                this.setState({
-                    transX: dx,
-                    transY: dy
-                })
-             }
-        }
+       
     }
 
     render(){
