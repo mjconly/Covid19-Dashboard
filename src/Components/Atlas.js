@@ -12,19 +12,19 @@ class Atlas extends Component{
             zoom: 2,
             height: 0,
             width: 0,
-            x: 0,
-            y: 0,
+            mouseX: 0,
+            mouseY: 0,
+            transX: 0,
+            transY: 0,
             top: 0,
             left: 0,
             right: 0,
-            bot: 0,
+            bottom: 0,
             draggable: false
         }
 
         this.lens = createRef();
 
-       
-        this.mouseIn = this.mouseIn.bind(this);
         this.mouseMove = this.mouseMove.bind(this);
         this.mouseUp = this.mouseUp.bind(this);
         this.mouseDown = this.mouseDown.bind(this);
@@ -33,6 +33,8 @@ class Atlas extends Component{
 
     componentDidMount(){
         window.addEventListener("resize", this.windowSize);
+        this.refs.map.leafletElement._layersMinZoom = 2;
+        console.log(this.refs.map.leafletElement.options);
         this.windowSize();
     }
 
@@ -41,65 +43,106 @@ class Atlas extends Component{
     }
 
     windowSize(){
-        const {left, top, right, bottom} = this.lens.current.getBoundingClientRect();
+        const {left, top, right, height} = this.lens.current.parentElement.getBoundingClientRect();
+
+        const zoomControl = document.getElementsByClassName("leaflet-control-zoom");
+        zoomControl[0].style.opacity = "0.5";
+        console.log(zoomControl)
 
         this.setState({
-            top,
-            left,
-            right,
-            bottom,
+            top: top + 1,
+            left: left + 1,
+            right: right,
+            bottom: height,
             height: window.innerHeight,
-            width: window.innerWidth
+            width: window.innerWidth,
+            transX: 0,
+            transY: 0
         })
-    }
-
-    mouseIn(e){
-        console.log(e.target.getBoundingClientRect());
     }
 
     mouseDown(e){
         e.target.style.cursor = "grabbing";
+
+        console.log(this.lens);
+
+        const {clientX, clientY} = e.nativeEvent;
+
         this.setState({
             draggable: true,
+            mouseX: clientX,
+            mouseY: clientY
         })
     }
 
     mouseUp(e){
         e.target.style.cursor = "grab";
         this.setState({
-            draggable: false
+            draggable: false,
         })
     }
 
     mouseMove(e){
         if (this.state.draggable){
-            console.log(e.nativeEvent);
+            let x = e.nativeEvent.clientX;
+            let y = e.nativeEvent.clientY;
+
+            let currX = this.state.transX;
+            let currY = this.state.transY;
+
+            let dx = x - this.state.mouseX;
+            let dy = y - this.state.mouseY;
+
+            dx += currX;
+            dy += currY; 
+
+            const {left, right, top, height} = this.lens.current.getBoundingClientRect();
+
+            
+            let toLeft = left + dx;
+            let toRight = right + dx;
+            let toTop = top + dy;
+            let toBot = height + dy;
+
+            let leftB = this.state.left + 10;
+            let rightB = this.state.right - 10;
+            let topB = this.state.top + 10;
+            let botB = this.state.bottom - 10;
+            
+
+            if (toLeft <= leftB && toRight >= rightB && toTop <= topB && toBot >= botB){
+                this.setState({
+                    transX: dx,
+                    transY: dy
+                })
+             }
         }
     }
 
     render(){
         return(
-            <div>
+            <div id="mapId">
                 <div
                 ref={this.lens} 
                 className="lens"
                 onMouseDown={this.mouseDown}
                 onMouseMove={this.mouseMove}
-                onMouseOver={this.mouseIn}
                 onMouseUp={this.mouseUp}
                 style={{ 
                     width: "1050px", 
                     height: "700px",
-
                     }} ></div>
                     <Map
+                        ref="map"
                         className="atlas"
-                        ref='map'
                         center={[this.state.lat, this.state.lng]}
                         zoom={this.state.zoom}
-                        style={{ width: "1050px", height: "700px"}}
-                        zoomControl={false}
-                        onDrag={(e) => this.onDrag(e, this.refs)}
+                        minZoom={2}
+                        style={{ 
+                            width: "1050px", 
+                            height: "700px",
+                            transform: `translate(${this.state.transX}px, ${this.state.transY}px)`
+                        }}
                     >
                         <TileLayer
                             attribution='Map data &copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors, <a href=&quot;https://creativecommons.org/licenses/by-sa/2.0/&quot;>CC-BY-SA</a>, Imagery &copy; <a href=&quot;https://www.mapbox.com/&quot;>Mapbox</a>'

@@ -5,18 +5,19 @@
     justify-content: center;
 }
 
-#mapid{
+#mapId{
     position: relative;
     z-index: 0;
-    width:60vw;
-    height:50vh;
+    max-width:60vw;
+    max-height:60vh;
     border: 1px red solid;
     text-align: center;
     overflow: hidden;
+  
 }
 
 .lens{
-    z-index: 2;
+    z-index: 0;
     position: absolute;
     border:1px blue solid;
 }
@@ -26,30 +27,12 @@
 }
 
 .atlas{
-    position: absolute;
-    z-index: 1;
-}
-
-.dash{
     position: relative;
     z-index: 1;
-    width:90vw;
-    height: 200px;
-    border:2px dashed black;
+    transition: .7s;
 }
 
-.red{
+div > .leaflet-control-zoom > .leaflet-bar > .leaflet-control{
     position: absolute;
-    z-index: 2;
-    width: 70vw;
-    height: 100px;
-    background-color: red;
-}
-
-.blue{
-    position: absolute;
-    z-index: 5;
-    width: 50vw;
-    height: 50px;
-    background-color:blue;
+    z-index:1003;
 }

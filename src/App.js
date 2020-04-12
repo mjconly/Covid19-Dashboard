@@ -5,9 +5,7 @@ import "./App.css"
 function App() {
   return (
     <div className="map-container">
-      <div id="mapid">
-          <Atlas></Atlas>
-      </div>
+        <Atlas></Atlas>
     </div>
   );
 }
