@@ -1,0 +1,102 @@
+.map-container{
+  display:flex;
+  justify-content: center;
+}
+
+.icon-marker {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  width: 3.6em;
+  height: 3.6em;
+  font-size: .8em;
+  font-weight: bold;
+  background-color: #f77b1a;
+  border-radius: 100%;
+  box-shadow: 0 2px 5px rgba(black, .9);
+  transition: .5s;
+}
+
+
+.leaflet-marker-pane:hover .leaflet-marker-icon .icon-marker {
+  transform: scale(.75);
+  opacity: .2;
+}
+
+
+.icon-marker:hover{
+  transform: scale(1.75) !important;
+  opacity: 1 !important;
+}
+
+
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}  
+
+.leaflet-popup-content{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.leaflet-popup-content-wrapper{
+  background-color: #36454F;
+}
+
+li{
+  list-style-type: none;
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.stub{
+  font-size: 1.2em;
+}
+
+.popup-list{
+  display:flex;
+  flex-direction: column;
+}
+
+.popup-content{
+  display: flex;
+  flex-direction: row;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.ratio{
+  display:flex;
+  flex-direction: column;
+}
+
+.cases{
+  font-weight: bold;
+  color: darkorange;
+}
+
+.deaths{
+  font-weight: bold;
+  color: lightcoral;
+}
+
+.recovered{
+  font-weight: bold;
+  color: forestgreen
+}
+
+.active{
+  font-weight: bold;
+  color:tomato;
+}
+
+.critical{
+  font-weight: bold;
+  color: gold;
+}

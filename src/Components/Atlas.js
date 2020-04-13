@@ -1,6 +1,10 @@
 import React, { Component, createRef } from "react";
 import { Map, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
-import "../App.css"
+import L, { divIcon, icon } from "leaflet"
+import axios from "axios";
+import { renderToStaticMarkup } from "react-dom/server";
+import "../App.scss";
+import Axios from "axios";
 
 class Atlas extends Component{
     constructor(props){
@@ -10,51 +14,105 @@ class Atlas extends Component{
             lat: 30,
             lng: 0,
             zoom: 2,
+            markers: null,
         }
+
+        this.getData = this.getData.bind(this);
     }
 
     componentDidMount(){
-
+        this.getData()
     }
 
     componentWillUnmount(){
        
     }
 
+    async getData(){
+
+        await axios.get("https://corona.lmao.ninja/v2/countries")
+            .then((res) => {
+                const geoJson = {
+                    type: "FeatureCollection",
+                    features: res.data.map((country) => {
+                        const caseString = `${country.cases}`;
+                        const caseMarker = country.cases > 1000 ? caseString.slice(0, -3) + "K+" : caseString;
+                        const iconMarkup = renderToStaticMarkup( 
+                            <div
+                            key={country} 
+                            className="icon-marker"
+                            >{caseMarker}
+                            </div>
+                        )
+
+                        return {
+                            type: "Feature",
+                            properties: {
+                                ...country
+                            },
+                            geometry: {
+                                type: "Point",
+                                coordinates: [country.countryInfo.lat, country.countryInfo.long]
+                            },
+                            icon: divIcon({
+                                html: iconMarkup
+                            }),
+                        }
+                    })
+                }
+
+                const markers = geoJson.features.map((marker) => {
+                    const coords = marker.geometry.coordinates;
+
+                    return (
+                        <Marker key={marker.properties.country} position={coords} icon={marker.icon}>
+                            <Popup>
+                                <li><h3>{marker.properties.country}</h3></li>
+                                <li className="update-on">Last Update: {new Date(marker.properties.updated).toLocaleString()}</li>
+                                <div key={marker.properties.country} className="popup-content">
+                                    <br />
+                                        <div className="popup-list">
+                                            <li> <span className="cases stub">Cases: </span>{marker.properties.cases}</li>
+                                            <li> <span className="cases stub">New Cases: </span>{marker.properties.todayCases}</li>
+                                            <li> <span className="deaths stub">Deaths: </span>{marker.properties.deaths}</li>
+                                            <li> <span className="deaths stub">New Deaths: </span>{marker.properties.todayDeaths}</li>
+                                            <li> <span className="recovered stub">Recovered: </span>{marker.properties.recovered}</li>
+                                            <li> <span className="active stub">Active: </span>{marker.properties.active}</li>
+                                            <li> <span className="critical stub">Critical: </span>{marker.properties.critical}</li>
+                                        </div>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    )
+                })
+
+                this.setState({
+                    markers
+                })
+            })
+            .catch((err) => {console.log(err)})
+    }
+
     render(){
         return(
-            <div id="mapId">
-                <div
-                ref={this.lens} 
-                className="lens"
-                onMouseDown={this.mouseDown}
-                onMouseMove={this.mouseMove}
-                onMouseUp={this.mouseUp}
+            <Map
+                className="atlas"
+                center={[this.state.lat, this.state.lng]}
+                zoom={this.state.zoom}
+                minZoom={2}
+                maxBoundsViscosity={.5}
+                maxBounds={[[-200, 200], [200, -200]]}
                 style={{ 
-                    width: "1050px", 
-                    height: "700px",
-                    }} ></div>
-                    <Map
-                        ref="map"
-                        className="atlas"
-                        center={[this.state.lat, this.state.lng]}
-                        zoom={this.state.zoom}
-                        minZoom={2}
-                        maxBoundsViscosity={1}
-                        maxBounds={[[90, 200], [-90, -200]]}
-                        style={{ 
-                            width: "1050px", 
-                            height: "700px",
-                            transform: `translate(${this.state.transX}px, ${this.state.transY}px)`
-                        }}
-                    >
-                        <TileLayer
-                            attribution='Map data &copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors, <a href=&quot;https://creativecommons.org/licenses/by-sa/2.0/&quot;>CC-BY-SA</a>, Imagery &copy; <a href=&quot;https://www.mapbox.com/&quot;>Mapbox</a>'
-                            url="https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWNvbiIsImEiOiJjazhxd3dqMTgwOG91M2RwZHN3MHlvYnVsIn0.DKv7sGBKWa6QdsFVZzNyNg"
-                    />
-                    
-                    </Map>
-            </div>
+                    width: "50vw", 
+                    height: "100vh",
+                }}
+            >
+                <TileLayer
+                    attribution='Map data &copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors, <a href=&quot;https://creativecommons.org/licenses/by-sa/2.0/&quot;>CC-BY-SA</a>, Imagery &copy; <a href=&quot;https://www.mapbox.com/&quot;>Mapbox</a>'
+                    url="https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWNvbiIsImEiOiJjazhxd3dqMTgwOG91M2RwZHN3MHlvYnVsIn0.DKv7sGBKWa6QdsFVZzNyNg"
+            />
+                {this.state.markers}
+            </Map>
         )
     }
 }
