@@ -4,7 +4,7 @@ import L, { divIcon, icon } from "leaflet"
 import axios from "axios";
 import { renderToStaticMarkup } from "react-dom/server";
 import "../App.scss";
-import Axios from "axios";
+
 
 class Atlas extends Component{
     constructor(props){
