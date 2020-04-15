@@ -133,9 +133,9 @@ class Atlas extends Component{
                         zoom={this.state.zoom}
                         minZoom={2}
                         maxBoundsViscosity={.5}
-                        maxBounds={[[-200, 200], [200, -200]]}
+                        maxBounds={[[-220, 220], [220, -220]]}
                         style={{ 
-                            width: "50vw", 
+                            width: "48vw", 
                             height: "100vh",
                         }}
                     >

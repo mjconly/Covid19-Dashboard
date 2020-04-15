@@ -124,7 +124,7 @@ class Charts extends Component{
                         titleFontColor: "hsl(195, 8%, 10%)",
                         titleFontSize: 16,
                         bodyFontColor: "hsl(195, 8%, 10%)",
-                        bodyFontSize: 12,
+                        bodyFontSize: 14,
                         xPadding: 10,
                         yPadding: 10,
                         callbacks: {
@@ -185,7 +185,7 @@ class Charts extends Component{
                         titleFontColor: "hsl(195, 8%, 10%)",
                         titleFontSize: 16,
                         bodyFontColor: "hsl(195, 8%, 10%)",
-                        bodyFontSize: 12,
+                        bodyFontSize: 14,
                         xPadding: 10,
                         yPadding: 10,
                         callbacks: {
@@ -217,6 +217,9 @@ class Charts extends Component{
                     :
                     ""
                 }
+                <div>
+                    <button>Options</button>
+                </div>
                 <div className="case-container"
                     style={{visibility: `${this.state.visible}`}}
                 >
@@ -226,6 +229,7 @@ class Charts extends Component{
                     style={{visibility: `${this.state.visible}`}}
                 >
                     <canvas id="deathChar" ref={this.deathChart}></canvas>
+                    <br />
                 </div>
             </div>
         );
