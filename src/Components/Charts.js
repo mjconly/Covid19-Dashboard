@@ -84,6 +84,12 @@ class Charts extends Component{
                         {
                             label:`${country}: Cases Since First Reported Case On ${firstCase}`,
                             borderColor: "#f77b1a",
+                            borderWidth: 1,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointHoverBorderWidth: 2,
+                            pointHoverBackgroundColor: "white",
+                            pointBorderColor: "#f77b1a",
                             data: caseNum,
                         }
                     ]
@@ -145,6 +151,12 @@ class Charts extends Component{
                         {
                             label: `${country}: Cases Since First Reported Case On ${firstCase}`,
                             borderColor: "#f77b1a",
+                            borderWidth: 1,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointHoverBorderWidth: 2,
+                            pointHoverBackgroundColor: "white",
+                            pointBorderColor: "#f77b1a",
                             data: deathNum,
                         }
                     ]
