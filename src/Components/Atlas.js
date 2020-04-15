@@ -16,9 +16,11 @@ class Atlas extends Component{
             lng: 0,
             zoom: 2,
             markers: null,
+            selected: "",
         }
 
         this.getData = this.getData.bind(this);
+        this.onCountrySelect = this.onCountrySelect.bind(this);
     }
 
     componentDidMount(){
@@ -27,6 +29,28 @@ class Atlas extends Component{
 
     componentWillUnmount(){
        
+    }
+
+    async onCountrySelect(country){
+        const start = new Date("1/1/2020");
+        const end = new Date(Date.now());
+
+        const difference = end.getTime() - start.getTime();
+
+        const days = difference / (1000 * 3600 * 24);
+
+        axios.get(`https://corona.lmao.ninja/v2/historical/${country}?lastdays=${days}`)
+            .then((res) => {
+                this.setState({
+                    selected: res.data
+                })
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    selected: `Data for past 60 days not avaliable for ${country}` 
+                })
+            })
     }
 
     async getData(){
@@ -66,7 +90,12 @@ class Atlas extends Component{
                     const coords = marker.geometry.coordinates;
 
                     return (
-                        <Marker key={marker.properties.country} position={coords} icon={marker.icon}>
+                        <Marker 
+                        key={marker.properties.country} 
+                        position={coords} 
+                        icon={marker.icon}
+                        onClick={() => this.onCountrySelect(marker.properties.country)}
+                        >
                             <Popup>
                                 <li><h3>{marker.properties.country}</h3></li>
                                 <li className="update-on">Last Update: {new Date(marker.properties.updated).toLocaleString()}</li>
@@ -117,7 +146,7 @@ class Atlas extends Component{
                         {this.state.markers}
                     </Map>
                 </div>
-                <Dashboard></Dashboard>
+                <Dashboard selected={this.state.selected}></Dashboard>
             </div>
         )
     }

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Charts from "./Charts"
+import "../App.scss"
 
 class Dashboard extends Component{
     constructor(props){
@@ -9,7 +10,7 @@ class Dashboard extends Component{
     render(){
         return(
             <div className="dashboard">
-                <Charts></Charts>
+                <Charts data={this.props.selected}></Charts>
             </div>
         );
     }
