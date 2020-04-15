@@ -3,6 +3,7 @@ import { Map, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
 import L, { divIcon, icon } from "leaflet"
 import axios from "axios";
 import { renderToStaticMarkup } from "react-dom/server";
+import Dashboard from "./Dashboard";
 import "../App.scss";
 
 
@@ -95,24 +96,29 @@ class Atlas extends Component{
 
     render(){
         return(
-            <Map
-                className="atlas"
-                center={[this.state.lat, this.state.lng]}
-                zoom={this.state.zoom}
-                minZoom={2}
-                maxBoundsViscosity={.5}
-                maxBounds={[[-200, 200], [200, -200]]}
-                style={{ 
-                    width: "50vw", 
-                    height: "100vh",
-                }}
-            >
-                <TileLayer
-                    attribution='Map data &copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors, <a href=&quot;https://creativecommons.org/licenses/by-sa/2.0/&quot;>CC-BY-SA</a>, Imagery &copy; <a href=&quot;https://www.mapbox.com/&quot;>Mapbox</a>'
-                    url="https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWNvbiIsImEiOiJjazhxd3dqMTgwOG91M2RwZHN3MHlvYnVsIn0.DKv7sGBKWa6QdsFVZzNyNg"
-            />
-                {this.state.markers}
-            </Map>
+            <div className="main-container">
+                <div className="map-container">
+                    <Map
+                        className="atlas"
+                        center={[this.state.lat, this.state.lng]}
+                        zoom={this.state.zoom}
+                        minZoom={2}
+                        maxBoundsViscosity={.5}
+                        maxBounds={[[-200, 200], [200, -200]]}
+                        style={{ 
+                            width: "50vw", 
+                            height: "100vh",
+                        }}
+                    >
+                        <TileLayer
+                            attribution='Map data &copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors, <a href=&quot;https://creativecommons.org/licenses/by-sa/2.0/&quot;>CC-BY-SA</a>, Imagery &copy; <a href=&quot;https://www.mapbox.com/&quot;>Mapbox</a>'
+                            url="https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWNvbiIsImEiOiJjazhxd3dqMTgwOG91M2RwZHN3MHlvYnVsIn0.DKv7sGBKWa6QdsFVZzNyNg"
+                    />
+                        {this.state.markers}
+                    </Map>
+                </div>
+                <Dashboard></Dashboard>
+            </div>
         )
     }
 }

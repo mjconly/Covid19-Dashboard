@@ -1,10 +1,12 @@
 .main-container{
   display:flex;
   justify-content: start;
+  max-height: 100vh;
 }
 
 .map-container{
-  width:50%;
+  width:50vw;
+  max-height: 100vh;
 }
 
 .icon-marker {
@@ -105,9 +107,29 @@ li{
   color: gold;
 }
 
-.chart-container {
-  width: 50vw;
-  height: 50vh;
+.dash-charts{
+  display: flex;
+  flex-direction: column;
+  max-width: 45vw;
+  max-height: 100vh;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.case-container {
+  min-width: 50vw;
+  min-height: 50vh;
+  background: white;
+  padding: 30px 20px 10px 20px;
+  border-radius: 10px;
+  -webkit-box-shadow: 0px 10px 0px -5px rgba(0,0,0,0.3);
+  -moz-box-shadow: 0px 10px 0px -5px rgba(0,0,0,0.3);
+  box-shadow: 0px 10px 0px -5px rgba(0,0,0,0.3);
+}
+
+.death-container {
+  min-width: 50vw;
+  min-height: 50vh;
   background: white;
   padding: 30px 20px 10px 20px;
   border-radius: 10px;
