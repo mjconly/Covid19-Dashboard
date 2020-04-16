@@ -1,3 +1,33 @@
+# Covid 19 Dashboard
+
+## Overview
+Web application built with **React, React-Leaflet, Chart.js**.
+Shows global case numbers on a map. When a country is selected information
+will be displayed regarding the current totals for that country as well as
+graphs depicting the current case and death trends, and if available, the province/state
+breakdown for that country.
+
+**This app uses the NOVELCovid/API**
+(https://corona.lmao.ninja/docs/)
+
+
+## View
+To view the application click [here](https://covid19-dash-board.herokuapp.com/)
+<br></br>
+<br></br>
+<br></br>
+
+
+
+
+
+
+
+
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
