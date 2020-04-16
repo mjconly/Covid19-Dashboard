@@ -30,8 +30,6 @@ class Charts extends Component{
         this.provinceCase = createRef();
         this.provinceDeath = createRef();
 
-        this.progressProvinceChart = this.progressProvinceChart.bind(this);
-        this.parseStateData = this.parseStateData.bind(this);
         this.buildProvinceChart = this.buildProvinceChart.bind(this);
     }
 
@@ -264,70 +262,6 @@ class Charts extends Component{
         }
     }
 
-    progressProvinceChart(curr, total){
-        // let provinceCaseChart = this.provinceCase.current.getContext("2d");
-        // let provinceDeathChart = this.provinceDeath.current.getContext("2d");
-        
-        // let provinceCases = this.state.provinceCase;
-        // let provinceDeaths = this.state.provinceDeath;
-
-        // if (provinceCases !== null){
-        //     provinceCases.destroy();
-        // } 
-
-        // if (provinceDeaths !== null){
-        //     provinceDeaths.destroy();
-        // }
-
-        const progressCase = document.getElementById("animationProgressCase");
-        const progressDeath = document.getElementById("animationProgressDeath");
-        progressCase.value = curr / total;
-        progressDeath.value = curr / total;
-
-        // provinceCases = new Chart(provinceCaseChart, {
-        //     options:{
-        //         animation: {
-        //             onProgress: function(animation){
-        //                 progressCase.value = curr / total;
-        //             },
-        //             onComplete: function() {
-		// 				window.setTimeout(function() {
-		// 					progressCase.value = 0;
-        //                 }, 500);
-        //             }
-        //         }
-        //     }
-            
-        // })
-
-        // provinceDeaths = new Chart(provinceDeathChart,{
-        //     options: {
-        //         animation: {
-        //             duration: 2000,
-        //             onProgress: function(animation){
-        //                 progressDeath.value = animation.currentStep / animation.numSteps;
-        //             },
-        //             onComplete: function() {
-		// 				window.setTimeout(function() {
-		// 					progressDeath.value = 0;
-        //                 }, 2000);
-        //             }
-        //         }
-        //     }
-        // })
-
-        if (curr === total){
-            progressDeath.value = 1;
-            progressCase.value = 1;
-            this.setState({
-                progressVisible: "hidden",
-                provinceDeath: null,
-                provinceCase: null,
-            })
-        }
-        
-    }
-
     buildProvinceChart(provinceData, country){
         let provinceCaseChart = this.provinceCase.current.getContext("2d");
         let provinceDeathChart = this.provinceDeath.current.getContext("2d");
@@ -343,11 +277,8 @@ class Charts extends Component{
             provinceDeaths.destroy();
         }
 
-        const caseSet = [];
-        const deathSet = [];
+
         const barX = [];
-        const barY = [];
-        const daySet = provinceData[0].day;
 
         const plotCase = {
             data: [],
@@ -391,34 +322,7 @@ class Charts extends Component{
             plotDeath.data.push(prov.deaths);
             plotDeath.backgroundColor.push(this.state.colors[color]);
             plotDeath.borderColor.push(this.state.colors[color]);
-            // let plotCase = {
-            //     label: `${prov.name} cases`,
-            //     fill: false,
-            //     borderColor: this.state.colors[color],
-            //     // // borderWidth: 1,
-            //     // // pointRadius: 2,
-            //     // // pointHoverRadius: 3,
-            //     // // pointHoverBorderWidth: 2,
-            //     // // pointHoverBackgroundColor: "white",
-            //     // pointBorderColor: this.state.colors[color],
-            //     data: [prov.caseNum[prov.caseNum.length - 1]],
-            // }
-
-            // let plotDeath = {
-            //     label: `${prov.name} deaths`,
-            //     fill: false,
-            //     borderColor: this.state.colors[color],
-            //     borderWidth: 1,
-            //     pointRadius: 2,
-            //     pointHoverRadius: 3,
-            //     pointHoverBorderWidth: 2,
-            //     pointHoverBackgroundColor: "white",
-            //     pointBorderColor: this.state.colors[color],
-            //     data: prov.deathNum,
-            // }
             color ++;
-            caseSet.push(plotCase);
-            deathSet.push(plotDeath);
         }
 
 
@@ -434,8 +338,6 @@ class Charts extends Component{
             callbacks: {
                 label: (item, data) => {
                     const idx = item.datasetIndex;
-                    console.log(item);
-                    console.log(data);
                     return `${data.datasets[idx].label}: ${item.yLabel}`
                 }
             }
@@ -483,8 +385,6 @@ class Charts extends Component{
                 }
             }]
         }
-
-        console.log(barY);
 
         provinceCases = new Chart(provinceCaseChart, {
             type: "bar",
@@ -540,67 +440,17 @@ class Charts extends Component{
     }
 
     async getProvinceData(country, provinces){
-        const response = [];
         if (country === "USA"){
             provinces = this.state.states;
-            let curr = 0;
-            const total = provinces.length - 1;
-            this.progressProvinceChart(curr, total);
             axios.get("https://corona.lmao.ninja/v2/states")
                 .then((res) => {
                     this.buildProvinceChart(res.data, country)
                 })
                 .catch((err) => {console.log(err)});
             }
-
-            // for (let prov of provinces){
-            //     let url = `https://corona.lmao.ninja/v2/historical/usacounties/${prov}?lastdays=all`;
-            //     await axios.get(url)
-            //         .then((res) => {
-            //             response.push(res.data)
-            //             this.progressProvinceChart(curr, total);
-            //         })
-            //         .catch((err) => console.log(err));
-            //         curr++
-            // }
-
-            // const stateData = this.parseStateData(response);
-            // this.buildProvinceChart(stateData, country);
     }
 
-    parseStateData(data){
-        const allState = [];
-        
-        for (let st of data){
-            let state = {};
-            state.name = st[0].province;
-            state.cases = st[0].timeline.cases;
-            state.deaths = st[0].timeline.deaths;
-            state.day = [];
-            state.caseNum = [];
-            state.deathNum = [];
-            for (let ct = 1; ct < st.length; ct++){
-                let county = st[ct];
-                let timelineCase = county.timeline.cases;
-                let timelineDeath = county.timeline.deaths;
-                for(let day in timelineCase){
-                    state.cases[day] += timelineCase[day];
-                    state.deaths[day] += timelineDeath[day]; 
-                }
-            }
-
-            for (let days in state.cases){
-                state.day.push(days);
-                state.caseNum.push(state.cases[days]);
-                state.deathNum.push(state.deaths[days]);
-            }
-
-            allState.push(state);
-        }
-
-        return allState;
-    }
-
+    
     render(){
         return(
             <div className="dash-charts">
@@ -624,23 +474,11 @@ class Charts extends Component{
                     style={{visibility: `${this.state.provinceVisible}`}}
                 >
                     <canvas id="deathChar" ref={this.provinceCase}></canvas>
-                    <progress id="animationProgressCase" max="1" value="0" 
-                    style={{ 
-                        width: "100%",
-                        visibility: `${this.state.progressVisible}`,
-                        }}>
-                    </progress>
                 </div>
                 <div className="prov-death-container"
                     style={{visibility: `${this.state.provinceVisible}`}}
                 >
                     <canvas id="deathChar" ref={this.provinceDeath}></canvas>
-                    <progress id="animationProgressDeath" max="1" value="0" 
-                    style={{
-                        width: "100%",
-                        visibility: `${this.state.progressVisible}`
-                    }}
-                    ></progress>
                 </div>
             </div>
         );
