@@ -10,7 +10,7 @@ class Dashboard extends Component{
     render(){
         return(
             <div className="dashboard">
-                <Charts data={this.props.selected}></Charts>
+                <Charts data={this.props.selected} global={this.props.global}></Charts>
             </div>
         );
     }

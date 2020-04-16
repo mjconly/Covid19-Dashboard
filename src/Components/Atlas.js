@@ -1,10 +1,9 @@
 import React, { Component, createRef } from "react";
-import { Map, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
+import { Map as Mapp, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
 import L, { divIcon, icon } from "leaflet"
 import axios from "axios";
 import { renderToStaticMarkup } from "react-dom/server";
 import Dashboard from "./Dashboard";
-import ProvinceChart from "./ProvinceCharts";
 import "../App.scss";
 
 
@@ -18,6 +17,7 @@ class Atlas extends Component{
             zoom: 2,
             markers: null,
             selected: "",
+            global: null,
         }
 
         this.getData = this.getData.bind(this);
@@ -35,21 +35,51 @@ class Atlas extends Component{
     async onCountrySelect(country){
         const start = new Date("1/1/2020");
         const end = new Date(Date.now());
-
         const difference = end.getTime() - start.getTime();
-
         const days = difference / (1000 * 3600 * 24);
+        let globalData;
+
+        await axios.get("https://corona.lmao.ninja/v2/jhucsse")
+            .then((res) => {globalData = res.data})
+            .catch((err) => console.log(err));
 
         axios.get(`https://corona.lmao.ninja/v2/historical/${country}?lastdays=${days}`)
             .then((res) => {
+
+                const byProvince = new Map();
+
+                for (let prov of globalData){
+                    if (prov.province != null){
+                        if (byProvince.get(prov.country) !== undefined){
+                            const value = byProvince.get(prov.country);
+                            value.push({
+                                province: prov.province,
+                                cases: prov.stats.confirmed,
+                                deaths: prov.stats.deaths,
+                            })
+                            byProvince.set(prov.country, value)
+                        }
+                        else{
+                            const value = [];
+                            value.push({
+                                province: prov.province,
+                                cases: prov.stats.confirmed,
+                                deaths: prov.stats.deaths,
+                            })
+                            byProvince.set(prov.country, value)
+                        }
+                    }
+                }
+
                 this.setState({
-                    selected: res.data
+                    selected: res.data,
+                    global: byProvince,
                 })
             })
             .catch((err) => {
                 console.log(err);
                 this.setState({
-                    selected: `Data for past 60 days not avaliable for ${country}` 
+                    selected: `Timeline data not avaliable for ${country}` 
                 })
             })
     }
@@ -128,7 +158,7 @@ class Atlas extends Component{
         return(
             <div className="main-container">
                 <div className="map-container">
-                    <Map
+                    <Mapp
                         className="atlas"
                         center={[this.state.lat, this.state.lng]}
                         zoom={this.state.zoom}
@@ -145,9 +175,9 @@ class Atlas extends Component{
                             url="https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWNvbiIsImEiOiJjazhxd3dqMTgwOG91M2RwZHN3MHlvYnVsIn0.DKv7sGBKWa6QdsFVZzNyNg"
                     />
                         {this.state.markers}
-                    </Map>
+                    </Mapp>
                 </div>
-                <Dashboard selected={this.state.selected}></Dashboard>
+                <Dashboard selected={this.state.selected} global={this.state.global}></Dashboard>
             </div>
         )
     }

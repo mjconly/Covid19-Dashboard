@@ -22,7 +22,8 @@ class Charts extends Component{
             states: [],
             colors: [],
             fetching: false,
-            progressVisible: "hidden"
+            progressVisible: "hidden",
+            provmessage: "",
         }
 
         this.caseChart = createRef();
@@ -34,12 +35,6 @@ class Charts extends Component{
     }
 
     componentDidMount(){
-        const states = [ "alabama", "alaska","arizona", "arkansas", "california", "colorado", "connecticut", "delaware","florida",
-        "georgia","hawaii","idaho","illinois","indiana","iowa","kansas","kentucky","louisiana","maine","maryland","massachusetts","michigan",
-        "minnesota","mississippi","missouri","montana","nebraska","nevada","new hampshire","new jersey","new mexico","new york","north carolina",
-        "north dakota","ohio", "oklahoma","oregon","pennsylvania", "rhode island","south carolina","south dakota","tennessee","texas",
-        "utah","vermont","virginia","washington","west virginia","wisconsin","wyoming"]
-
         const colors = [
             "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
             "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
@@ -58,7 +53,6 @@ class Charts extends Component{
 
         this.setState({
             message: "Select a country on the map to view cases and deaths over 30 days",
-            states,
             colors,
         })
     }
@@ -82,13 +76,15 @@ class Charts extends Component{
             if (typeof this.props.data === "string"){
                 this.setState({
                     message: this.props.data,
-                    visible: "hidden"
+                    visible: "hidden",
+                    provinceVisible: "hidden",
+                    provmessage: "",
                 })
                 return;
             }
             
 
-            const {provinces, country, timeline} = this.props.data;
+            const {country, timeline} = this.props.data;
             const message = ``;
 
             const caseDay = [];
@@ -244,10 +240,34 @@ class Charts extends Component{
             });
 
             let progressVisible = "hidden";
-            if (provinces.length > 1 || country === "USA"){
+            const provinces = this.props.global.get(country);
+            let provMessage = "";
+
+
+            if (country === "USA"){
                     this.getProvinceData(country, provinces);
                     progressVisible = "visible";
+            }
+            else if (country === "UK" || country === "France" || country === "Denmark" || country === "Netherlands" || provinces === undefined){
+                let provinceCases = this.state.provinceCase;
+                let provinceDeaths = this.state.provinceDeath;
+                provMessage = `Province data unavailable for ${country}`;
 
+                if (provinceCases !== null){
+                    provinceCases.destroy();
+                } 
+        
+                if (provinceDeaths !== null){
+                    provinceDeaths.destroy();
+                }
+
+                this.setState({
+                    progressVisible: "hidden",
+                    provinceVisible: "hidden",
+                })
+            }
+            else if (provinces !== undefined){
+                this.buildProvinceChart(provinces, country);
             }
 
             this.setState({
@@ -257,6 +277,7 @@ class Charts extends Component{
                 message,
                 visible: "visible",
                 progressVisible,
+                provmessage: provMessage,
             })
 
         }
@@ -470,6 +491,12 @@ class Charts extends Component{
                 >
                     <canvas id="deathChar" ref={this.deathChart}></canvas>
                 </div>
+                {this.state.provmesssage !== ""
+                    ?
+                    <h2 className="default-text">{this.state.provmessage}</h2>
+                    :
+                    ""
+                }
                 <div className="prov-case-container"
                     style={{visibility: `${this.state.provinceVisible}`}}
                 >
@@ -479,6 +506,9 @@ class Charts extends Component{
                     style={{visibility: `${this.state.provinceVisible}`}}
                 >
                     <canvas id="deathChar" ref={this.provinceDeath}></canvas>
+                </div>
+                <div>
+                    <br></br>
                 </div>
             </div>
         );
