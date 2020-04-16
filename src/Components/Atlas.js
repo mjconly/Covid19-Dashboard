@@ -4,6 +4,7 @@ import L, { divIcon, icon } from "leaflet"
 import axios from "axios";
 import { renderToStaticMarkup } from "react-dom/server";
 import Dashboard from "./Dashboard";
+import ProvinceChart from "./ProvinceCharts";
 import "../App.scss";
 
 
